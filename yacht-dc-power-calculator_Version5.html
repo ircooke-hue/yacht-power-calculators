@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yacht DC Power Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a2849 25%, #0f1729 50%, #1a1a3e 75%, #0a0e27 100%);
+            background-attachment: fixed;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #76ff03, #00ff88, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(118, 255, 3, 0.3);
+            filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.2));
+        }
+
+        .subtitle {
+            color: #b0e0ff;
+            font-size: 0.9em;
+            letter-spacing: 2px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: rgba(20, 25, 45, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(118, 255, 3, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1),
+                0 0 40px rgba(118, 255, 3, 0.1);
+        }
+
+        .section-title {
+            color: #76ff03;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(118, 255, 3, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            color: #b0e0ff;
+            font-weight: 500;
+        }
+
+        .label-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            margin-left: 8px;
+            background: rgba(118, 255, 3, 0.2);
+            border: 1px solid #76ff03;
+            border-radius: 50%;
+            color: #76ff03;
+            font-size: 0.75em;
+            font-weight: bold;
+            cursor: help;
+        }
+
+        .label-icon:hover {
+            background: rgba(118, 255, 3, 0.3);
+            box-shadow: 0 0 10px rgba(118, 255, 3, 0.4);
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid rgba(118, 255, 3, 0.3);
+            border-radius: 8px;
+            background: rgba(30, 35, 55, 0.6);
+            color: #e0e0e0;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="number"]:hover,
+        input[type="text"]:hover,
+        select:hover {
+            background: rgba(40, 50, 80, 0.8);
+            border-color: rgba(118, 255, 3, 0.5);
+            box-shadow: 0 0 15px rgba(118, 255, 3, 0.1);
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            background: rgba(40, 50, 80, 0.9);
+            border-color: #76ff03;
+            box-shadow: 0 0 20px rgba(118, 255, 3, 0.3), inset 0 0 10px rgba(118, 255, 3, 0.05);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .device-input-wrapper {
+            position: relative;
+        }
+
+        .custom-device-input {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .custom-device-input.show {
+            display: block;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #76ff03, #00ff88);
+            color: #121212;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(118, 255, 3, 0.3);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(118, 255, 3, 0.5);
+        }
+
+        .btn-add:active {
+            transform: translateY(0);
+        }
+
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 0.75em;
+            background: rgba(255, 100, 100, 0.2);
+            color: #ff6464;
+            border: 1px solid #ff6464;
+            width: auto;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .btn-small:hover {
+            background: rgba(255, 100, 100, 0.3);
+            box-shadow: 0 0 10px rgba(255, 100, 100, 0.2);
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #76ff03, #00ff88);
+            color: #121212;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(118, 255, 3, 0.3);
+            margin-top: 20px;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(118, 255, 3, 0.5);
+        }
+
+        .btn-reset {
+            background: rgba(118, 255, 3, 0.1);
+            color: #76ff03;
+            border: 1px solid #76ff03;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(118, 255, 3, 0.2);
+            margin-top: 10px;
+        }
+
+        .btn-reset:hover {
+            background: rgba(118, 255, 3, 0.2);
+            box-shadow: 0 6px 25px rgba(118, 255, 3, 0.3);
+        }
+
+        .load-item {
+            background: rgba(30, 50, 70, 0.4);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .load-item-name {
+            color: #76ff03;
+            font-weight: 500;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .load-item-value {
+            color: #b0e0ff;
+            text-align: center;
+            font-size: 0.9em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .load-item-value strong {
+            font-size: 1.1em;
+        }
+
+        .load-item-value span {
+            font-size: 0.8em;
+            color: #7a9fb0;
+        }
+
+        .source-item {
+            background: rgba(30, 50, 70, 0.4);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .source-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .source-name {
+            color: #76ff03;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .source-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .source-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .source-field label {
+            font-size: 0.8em;
+            color: #7a9fb0;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #76ff03;
+        }
+
+        .results-container {
+            grid-column: 1 / -1;
+            display: none;
+        }
+
+        .results-container.active {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-box {
+            background: rgba(30, 50, 70, 0.5);
+            border-left: 3px solid #76ff03;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-box.warning {
+            border-left-color: #ff9800;
+        }
+
+        .result-box.alert {
+            border-left-color: #ff6464;
+        }
+
+        .result-label {
+            color: #b0e0ff;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #76ff03, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-box.warning .result-value {
+            background: linear-gradient(135deg, #ff9800, #ffb74d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-box.alert .result-value {
+            background: linear-gradient(135deg, #ff6464, #ff8a8a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-unit {
+            color: #7a9fb0;
+            font-size: 0.6em;
+            margin-left: 5px;
+        }
+
+        .chart-container {
+            background: rgba(30, 50, 70, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            color: #b0e0ff;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bar {
+            margin-bottom: 15px;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #b0e0ff;
+            font-size: 0.85em;
+        }
+
+        .bar-fill {
+            height: 25px;
+            background: linear-gradient(90deg, #76ff03, #00ff88);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill.warning {
+            background: linear-gradient(90deg, #ff9800, #ffb74d);
+        }
+
+        .bar-fill.alert {
+            background: linear-gradient(90deg, #ff6464, #ff8a8a);
+        }
+
+        .bar-text {
+            color: #121212;
+            font-size: 0.8em;
+            font-weight: bold;
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+        }
+
+        .tooltip {
+            display: none;
+            position: fixed;
+            background: rgba(20, 25, 45, 0.95);
+            border: 1px solid #76ff03;
+            color: #b0e0ff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            max-width: 300px;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(118, 255, 3, 0.2);
+            pointer-events: none;
+            line-height: 1.4;
+        }
+
+        .tooltip.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .info-section {
+            background: rgba(118, 255, 3, 0.05);
+            border-left: 3px solid #76ff03;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #b0e0ff;
+            line-height: 1.6;
+        }
+
+        .info-section h4 {
+            color: #76ff03;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .no-loads {
+            color: #ff9800;
+            padding: 20px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .voltage-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .voltage-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid rgba(118, 255, 3, 0.3);
+            background: rgba(30, 35, 55, 0.6);
+            color: #b0e0ff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .voltage-btn.active {
+            border-color: #76ff03;
+            background: rgba(118, 255, 3, 0.2);
+            color: #76ff03;
+            box-shadow: 0 0 15px rgba(118, 255, 3, 0.3);
+        }
+
+        .voltage-btn:hover {
+            border-color: #76ff03;
+            background: rgba(118, 255, 3, 0.15);
+        }
+
+        .source-description {
+            font-size: 0.8em;
+            color: #7a9fb0;
+            margin-top: 5px;
+            line-height: 1.3;
+            font-style: italic;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .load-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .load-item-name {
+                width: 100%;
+            }
+
+            .load-item-value {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .voltage-selector {
+                flex-wrap: wrap;
+            }
+
+            .load-item {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ YACHT DC POWER CALCULATOR</h1>
+            <p class="subtitle">Professional Marine DC System Analysis</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- LOADS SECTION -->
+            <div class="section">
+                <div class="section-title">DC Loads</div>
+                
+                <div class="input-group">
+                    <label>
+                        System Voltage
+                        <span class="label-icon" onmouseover="showTooltip(event, 'Select your vessel\'s DC voltage system. 12V for small boats, 24V for medium cruisers, 48V for larger vessels or electric propulsion systems.')" onmouseout="hideTooltip()">?</span>
+                    </label>
+                    <div class="voltage-selector">
+                        <button class="voltage-btn active" onclick="setVoltage(12)">12V DC</button>
+                        <button class="voltage-btn" onclick="setVoltage(24)">24V DC</button>
+                        <button class="voltage-btn" onclick="setVoltage(48)">48V DC</button>
+                    </div>
+                </div>
+
+                <div class="input-group device-input-wrapper">
+                    <label>
+                        Device Name
+                        <span class="label-icon" onmouseover="showTooltip(event, 'Select a common marine device from the dropdown, or choose \"Custom\" to enter your own device name.')" onmouseout="hideTooltip()">?</span>
+                    </label>
+                    <select id="loadDeviceSelect" onchange="handleDeviceSelection()">
+                        <option value="">-- Select Device --</option>
+                        <optgroup label="Lighting">
+                            <option value="Navigation Lights">Navigation Lights</option>
+                            <option value="Cabin Lights">Cabin Lights</option>
+                            <option value="Deck Lights">Deck Lights</option>
+                            <option value="Mast Light">Mast Light</option>
+                            <option value="Spreader Lights">Spreader Lights</option>
+                        </optgroup>
+                        <optgroup label="Refrigeration">
+                            <option value="Refrigerator">Refrigerator</option>
+                            <option value="Freezer">Freezer</option>
+                            <option value="Ice Maker">Ice Maker</option>
+                        </optgroup>
+                        <optgroup label="Navigation & Communication">
+                            <option value="GPS">GPS</option>
+                            <option value="VHF Radio">VHF Radio</option>
+                            <option value="SSB Radio">SSB Radio</option>
+                            <option value="Autopilot">Autopilot</option>
+                            <option value="Radar">Radar</option>
+                            <option value="Fish Finder">Fish Finder</option>
+                            <option value="AIS Transponder">AIS Transponder</option>
+                        </optgroup>
+                        <optgroup label="Propulsion">
+                            <option value="Bow Thruster">Bow Thruster</option>
+                            <option value="Stern Thruster">Stern Thruster</option>
+                            <option value="Electric Motor">Electric Motor</option>
+                        </optgroup>
+                        <optgroup label="Galley">
+                            <option value="Microwave">Microwave</option>
+                            <option value="Stove/Oven">Stove/Oven</option>
+                            <option value="Coffee Maker">Coffee Maker</option>
+                            <option value="Water Heater">Water Heater</option>
+                            <option value="Water Pump">Water Pump</option>
+                        </optgroup>
+                        <optgroup label="Climate Control">
+                            <option value="Air Conditioning">Air Conditioning</option>
+                            <option value="Fan">Fan</option>
+                            <option value="Heater">Heater</option>
+                        </optgroup>
+                        <optgroup label="Windlass & Anchoring">
+                            <option value="Windlass">Windlass</option>
+                            <option value="Anchor Winch">Anchor Winch</option>
+                        </optgroup>
+                        <optgroup label="Entertainment">
+                            <option value="Television">Television</option>
+                            <option value="Stereo System">Stereo System</option>
+                            <option value="Laptop Computer">Laptop Computer</option>
+                        </optgroup>
+                        <optgroup label="Misc">
+                            <option value="Bilge Pump">Bilge Pump</option>
+                            <option value="Washdown Pump">Washdown Pump</option>
+                            <option value="Battery Charger">Battery Charger</option>
+                            <option value="Inverter">Inverter</option>
+                        </optgroup>
+                        <option value="custom">+ Custom Device</option>
+                    </select>
+                    <div class="custom-device-input">
+                        <input type="text" id="customLoadName" placeholder="Enter custom device name">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>
+                            Current (A)
+                            <span class="label-icon" onmouseover="showTooltip(event, 'Current draw (amperes) at the selected voltage. Find the amperage on your device specification plate or manual. Example: A 12V fan drawing 5A.')" onmouseout="hideTooltip()">?</span>
+                        </label>
+                        <input type="number" id="loadAmps" placeholder="e.g., 10.5" min="0" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label>
+                            Daily Hours
+                            <span class="label-icon" onmouseover="showTooltip(event, 'Average operating hours per day. Examples: nav lights=12hrs (dusk to dawn), refrigerator=24hrs, VHF radio=2hrs. Be realistic about usage.')" onmouseout="hideTooltip()">?</span>
+                        </label>
+                        <input type="number" id="loadHours" placeholder="e.g., 8" min="0" max="24" step="0.5">
+                    </div>
+                </div>
+
+                <button class="btn-add" onclick="addLoad()">+ ADD LOAD</button>
+
+                <div id="loadsList" style="margin-top: 20px;"></div>
+
+                <div class="info-section" id="loadsInfo" style="display: none;">
+                    <h4>Load Summary</h4>
+                    <div id="loadsInfoText"></div>
+                </div>
+            </div>
+
+            <!-- POWER SOURCES SECTION -->
+            <div class="section">
+                <div class="section-title">Power Generation Sources</div>
+
+                <!-- ALTERNATOR -->
+                <div class="source-item">
+                    <div class="source-header">
+                        <span class="source-name">
+                            <span class="checkbox-wrapper">
+                                <input type="checkbox" id="alternatorEnable" onchange="updateSourceInfo()">
+                            </span>
+                            ⚙️ ALTERNATOR (Engine-Driven)
+                        </span>
+                    </div>
+                    <div class="source-description">
+                        Charges batteries when engine runs. Typical yacht alternators: 50-200A @ 12V/24V. Output: 0.6-5 kW.
+                    </div>
+                    <span class="label-icon" style="position: absolute; right: 15px; top: 10px;" onmouseover="showTooltip(event, 'Marine alternators recharge your battery bank while the engine is running. Output rating depends on engine size: small engines (10-25hp) produce ~0.6-1.5 kW, medium engines (30-50hp) produce ~1.5-3 kW, large engines (60hp+) produce ~3-5 kW. Output: 50-200 Amps depending on system voltage (12V, 24V). Typical operation: 3-4 hours/day while cruising. Efficiency: ~85-95%.')" onmouseout="hideTooltip()">?</span>
+                    <div class="source-fields">
+                        <div class="source-field">
+                            <label>Max Output (kW)</label>
+                            <input type="number" id="alternatorOutput" placeholder="0.0" min="0" step="0.1" value="2.0" disabled>
+                        </div>
+                        <div class="source-field">
+                            <label>Daily Run Hours</label>
+                            <input type="number" id="alternatorHours" placeholder="0" min="0" max="24" step="0.5" value="4" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GENSET -->
+                <div class="source-item">
+                    <div class="source-header">
+                        <span class="source-name">
+                            <span class="checkbox-wrapper">
+                                <input type="checkbox" id="gensetEnable" onchange="updateSourceInfo()">
+                            </span>
+                            🔧 GENERATOR SET (Genset)
+                        </span>
+                    </div>
+                    <div class="source-description">
+                        Diesel/gas-powered AC generator with inverter. More efficient for sustained power. Fuel consumption: 0.2-0.4 L/kWh.
+                    </div>
+                    <span class="label-icon" style="position: absolute; right: 15px; top: 10px;" onmouseover="showTooltip(event, 'Dedicated diesel or gasoline generator for on-demand power. Typical yacht gensets: 5-15 kW (5000-15000W). Efficiency: 30-40% (thermal conversion). Fuel consumption: ~0.2-0.3 L/kWh at 75% load. Best for sustained loads. Most efficient at 50-75% of rated output. Daily use: 2-4 hours typical for liveaboards, 1-2 hours for cruisers. Noise: 75-85 dB (depends on enclosure). Cost: $15k-$40k installed.')" onmouseout="hideTooltip()">?</span>
+                    <div class="source-fields">
+                        <div class="source-field">
+                            <label>Max Output (kW)</label>
+                            <input type="number" id="gensetOutput" placeholder="0.0" min="0" step="0.5" value="5.0" disabled>
+                        </div>
+                        <div class="source-field">
+                            <label>Daily Run Hours</label>
+                            <input type="number" id="gensetHours" placeholder="0" min="0" max="24" step="0.5" value="3" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SOLAR -->
+                <div class="source-item">
+                    <div class="source-header">
+                        <span class="source-name">
+                            <span class="checkbox-wrapper">
+                                <input type="checkbox" id="solarEnable" onchange="updateSourceInfo()">
+                            </span>
+                            ☀️ SOLAR PANELS (PV)
+                        </span>
+                    </div>
+                    <div class="source-description">
+                        Peak output on clear day. Actual varies by latitude, season, cloud cover, panel angle. Typical yacht: 300-1000W.
+                    </div>
+                    <span class="label-icon" style="position: absolute; right: 15px; top: 10px;" onmouseover="showTooltip(event, 'Photovoltaic solar panels for passive renewable charging. Peak wattage: typical installations range from 100W (weekend boats) to 1000W+ (liveaboards). Actual daily output is 20-30% of peak rating depending on cloud cover, season, and latitude. Average daily generation in good conditions: 3-6 peak sun hours equivalent. Efficiency drops 0.4% per °C above 25°C. MPPT charge controller recommended (efficiency: 94-98%). No fuel cost. Lifespan: 25+ years. Best for: partial load offset, battery topping, extended cruising.')" onmouseout="hideTooltip()">?</span>
+                    <div class="source-fields">
+                        <div class="source-field">
+                            <label>Total Peak (kW)</label>
+                            <input type="number" id="solarOutput" placeholder="0.0" min="0" step="0.1" value="0.3" disabled>
+                        </div>
+                        <div class="source-field">
+                            <label>Daily Avg Hours</label>
+                            <input type="number" id="solarHours" placeholder="0" min="0" max="24" step="0.5" value="5" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WIND TURBINE -->
+                <div class="source-item">
+                    <div class="source-header">
+                        <span class="source-name">
+                            <span class="checkbox-wrapper">
+                                <input type="checkbox" id="windEnable" onchange="updateSourceInfo()">
+                            </span>
+                            💨 WIND TURBINE
+                        </span>
+                    </div>
+                    <div class="source-description">
+                        Marine wind turbine. Output varies dramatically by wind speed (power ∝ speed³). Typical avg: 0.5-1.5 kW.
+                    </div>
+                    <span class="label-icon" style="position: absolute; right: 15px; top: 10px;" onmouseover="showTooltip(event, 'Vertical or horizontal axis marine wind turbine for battery charging while anchored or sailing. Typical small yacht turbines: 250W-1000W rated output. CRITICAL: Output is extremely wind-speed dependent (power ∝ wind speed cubed). At 5 m/s average wind: ~30% of rated. At 10 m/s: ~80% of rated. Cut-in speed: 2.5-3.5 m/s. Avoids sailing regions with <4 m/s average wind. Best for: anchorages in windy locations (trade winds, coastal). Limited value in light/variable wind. Lifespan: 10-15 years. Noise: 50-60 dB. Installation cost: $2k-$8k. Not suitable for all sailing regions.')" onmouseout="hideTooltip()">?</span>
+                    <div class="source-fields">
+                        <div class="source-field">
+                            <label>Avg Output (kW)</label>
+                            <input type="number" id="windOutput" placeholder="0.0" min="0" step="0.1" value="0.3" disabled>
+                        </div>
+                        <div class="source-field">
+                            <label>Daily Avg Hours</label>
+                            <input type="number" id="windHours" placeholder="0" min="0" max="24" step="0.5" value="8" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AUXILIARY POWER -->
+                <div class="source-item">
+                    <div class="source-header">
+                        <span class="source-name">
+                            <span class="checkbox-wrapper">
+                                <input type="checkbox" id="auxEnable" onchange="updateSourceInfo()">
+                            </span>
+                            🔌 AUXILIARY POWER
+                        </span>
+                    </div>
+                    <div class="source-description">
+                        Shore power, external generator, or other renewable/charging source connected to your battery system.
+                    </div>
+                    <span class="label-icon" style="position: absolute; right: 15px; top: 10px;" onmouseover="showTooltip(event, 'Alternative power sources while docked or connected: shore power via inverter/charger, external generator, hydrogen fuel cell, or other supplemental charging. Typical power: 1-5 kW depending on availability and infrastructure. Available hours depend on dock/marina situation. Shore power typically 230V AC 16A = 3.7 kW (EU standard). Use this for dock charging and planned power sources.')" onmouseout="hideTooltip()">?</span>
+                    <div class="source-fields">
+                        <div class="source-field">
+                            <label>Power Available (kW)</label>
+                            <input type="number" id="auxOutput" placeholder="0.0" min="0" step="0.1" value="1.0" disabled>
+                        </div>
+                        <div class="source-field">
+                            <label>Daily Hours Available</label>
+                            <input type="number" id="auxHours" placeholder="0" min="0" max="24" step="0.5" value="0" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section" id="sourceInfo" style="display: none;">
+                    <h4>Active Power Sources</h4>
+                    <div id="sourceInfoText"></div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn-calculate" onclick="calculatePower()">CALCULATE POWER BALANCE</button>
+                    <button class="btn-reset" onclick="resetForm()">RESET</button>
+                </div>
+            </div>
+
+            <!-- RESULTS SECTION -->
+            <div class="section results-container" id="results">
+                <div class="section-title">Power Analysis & Results</div>
+
+                <div class="results-grid">
+                    <div class="result-box">
+                        <div class="result-label">Daily Load Energy</div>
+                        <div class="result-value"><span id="dailyLoadEnergy">0</span><span class="result-unit">kWh</span></div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Daily Supply Energy</div>
+                        <div class="result-value"><span id="dailySupplyEnergy">0</span><span class="result-unit">kWh</span></div>
+                    </div>
+                    <div class="result-box" id="balanceBox">
+                        <div class="result-label">Daily Energy Balance</div>
+                        <div class="result-value"><span id="balanceEnergy">0</span><span class="result-unit">kWh</span></div>
+                    </div>
+                </div>
+
+                <div class="results-grid">
+                    <div class="result-box">
+                        <div class="result-label">Peak Load Current</div>
+                        <div class="result-value"><span id="peakCurrent">0</span><span class="result-unit">A</span></div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Peak Load Power</div>
+                        <div class="result-value"><span id="peakPower">0</span><span class="result-unit">kW</span></div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">System Voltage</div>
+                        <div class="result-value"><span id="systemVoltage">12</span><span class="result-unit">V DC</span></div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Daily Energy Balance: Load vs Supply</div>
+                    <div class="bar">
+                        <div class="bar-label">
+                            <span>Daily Load Energy</span>
+                            <span id="barLoadLabel">0 kWh</span>
+                        </div>
+                        <div class="bar-fill" id="barLoad">
+                            <div class="bar-text" id="barLoadText"></div>
+                        </div>
+                    </div>
+                    <div class="bar">
+                        <div class="bar-label">
+                            <span>Daily Supply Energy</span>
+                            <span id="barSupplyLabel">0 kWh</span>
+                        </div>
+                        <div class="bar-fill" id="barSupply">
+                            <div class="bar-text" id="barSupplyText"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h4>System Analysis & Recommendations</h4>
+                    <div id="systemAnalysis"></div>
+                </div>
+
+                <div id="detailedReport" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Data structures
+        let currentVoltage = 12;
+        let loads = [];
+        let loadCounter = 0;
+
+        function showTooltip(event, text) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.innerHTML = text;
+            tooltip.classList.add('show');
+            
+            let x = event.pageX + 15;
+            let y = event.pageY + 15;
+            
+            if (x + 300 > window.innerWidth) {
+                x = event.pageX - 315;
+            }
+            if (y + 100 > window.innerHeight) {
+                y = event.pageY - 100;
+            }
+            
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').classList.remove('show');
+        }
+
+        function setVoltage(voltage) {
+            currentVoltage = voltage;
+            document.querySelectorAll('.voltage-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function handleDeviceSelection() {
+            const select = document.getElementById('loadDeviceSelect');
+            const customInput = document.querySelector('.custom-device-input');
+            
+            if (select.value === 'custom') {
+                customInput.classList.add('show');
+                document.getElementById('customLoadName').focus();
+            } else {
+                customInput.classList.remove('show');
+            }
+        }
+
+        function getDeviceName() {
+            const select = document.getElementById('loadDeviceSelect');
+            
+            if (select.value === 'custom') {
+                return document.getElementById('customLoadName').value;
+            } else {
+                return select.value;
+            }
+        }
+
+        function addLoad() {
+            const name = getDeviceName();
+            const amps = parseFloat(document.getElementById('loadAmps').value);
+            const hours = parseFloat(document.getElementById('loadHours').value);
+
+            if (!name || isNaN(amps) || isNaN(hours)) {
+                alert('Please select/enter a device name and fill in all load fields');
+                return;
+            }
+
+            const load = {
+                id: loadCounter++,
+                name: name,
+                amps: amps,
+                hours: hours,
+                voltage: currentVoltage
+            };
+
+            loads.push(load);
+            renderLoads();
+
+            // Clear inputs
+            document.getElementById('loadDeviceSelect').value = '';
+            document.getElementById('customLoadName').value = '';
+            document.querySelector('.custom-device-input').classList.remove('show');
+            document.getElementById('loadAmps').value = '';
+            document.getElementById('loadHours').value = '';
+        }
+
+        function removeLoad(id) {
+            loads = loads.filter(load => load.id !== id);
+            renderLoads();
+        }
+
+        function renderLoads() {
+            const loadsList = document.getElementById('loadsList');
+            
+            if (loads.length === 0) {
+                loadsList.innerHTML = '<div class="no-loads">No loads added yet. Add your first device above.</div>';
+                return;
+            }
+
+            loadsList.innerHTML = loads.map(load => {
+                const power = (load.amps * load.voltage) / 1000;
+                const energy = power * load.hours;
+                return `
+                    <div class="load-item">
+                        <div style="flex: 1; min-width: 150px;">
+                            <div class="load-item-name">${load.name}</div>
+                            <div class="load-item-value" style="color: #7a9fb0; font-size: 0.8em; flex-direction: row; gap: 5px; margin-top: 3px;">${load.voltage}V DC</div>
+                        </div>
+                        <div class="load-item-value"><strong>${load.amps.toFixed(1)}</strong><span>Amps</span></div>
+                        <div class="load-item-value"><strong>${power.toFixed(2)}</strong><span>kW</span></div>
+                        <div class="load-item-value"><strong>${load.hours.toFixed(1)}</strong><span>hrs</span></div>
+                        <div class="load-item-value"><strong>${energy.toFixed(2)}</strong><span>kWh</span></div>
+                        <button class="btn-small" onclick="removeLoad(${load.id})">✕ Remove</button>
+                    </div>
+                `;
+            }).join('');
+
+            updateLoadsInfo();
+        }
+
+        function updateLoadsInfo() {
+            const totalPower = loads.reduce((sum, load) => sum + (load.amps * load.voltage / 1000), 0);
+            const totalEnergy = loads.reduce((sum, load) => sum + (load.amps * load.voltage / 1000 * load.hours), 0);
+            const peakCurrent = loads.reduce((sum, load) => sum + load.amps, 0);
+
+            document.getElementById('loadsInfo').style.display = 'block';
+            document.getElementById('loadsInfoText').innerHTML = `
+                <strong>Peak Load:</strong> ${totalPower.toFixed(2)} kW (${peakCurrent.toFixed(1)} A @ ${currentVoltage}V DC)<br>
+                <strong>Daily Energy Required:</strong> ${totalEnergy.toFixed(2)} kWh<br>
+                <strong>Loads Added:</strong> ${loads.length} device(s)
+            `;
+        }
+
+        function updateSourceInfo() {
+            const alternatorEnable = document.getElementById('alternatorEnable').checked;
+            const gensetEnable = document.getElementById('gensetEnable').checked;
+            const solarEnable = document.getElementById('solarEnable').checked;
+            const windEnable = document.getElementById('windEnable').checked;
+            const auxEnable = document.getElementById('auxEnable').checked;
+
+            // Enable/disable inputs
+            document.getElementById('alternatorOutput').disabled = !alternatorEnable;
+            document.getElementById('alternatorHours').disabled = !alternatorEnable;
+            document.getElementById('gensetOutput').disabled = !gensetEnable;
+            document.getElementById('gensetHours').disabled = !gensetEnable;
+            document.getElementById('solarOutput').disabled = !solarEnable;
+            document.getElementById('solarHours').disabled = !solarEnable;
+            document.getElementById('windOutput').disabled = !windEnable;
+            document.getElementById('windHours').disabled = !windEnable;
+            document.getElementById('auxOutput').disabled = !auxEnable;
+            document.getElementById('auxHours').disabled = !auxEnable;
+
+            // Update info section
+            const sources = [];
+            if (alternatorEnable) sources.push(`<strong>⚙️ Alternator:</strong> ${document.getElementById('alternatorOutput').value} kW × ${document.getElementById('alternatorHours').value} hrs/day = ${(parseFloat(document.getElementById('alternatorOutput').value) * parseFloat(document.getElementById('alternatorHours').value)).toFixed(2)} kWh`);
+            if (gensetEnable) sources.push(`<strong>🔧 Genset:</strong> ${document.getElementById('gensetOutput').value} kW × ${document.getElementById('gensetHours').value} hrs/day = ${(parseFloat(document.getElementById('gensetOutput').value) * parseFloat(document.getElementById('gensetHours').value)).toFixed(2)} kWh`);
+            if (solarEnable) sources.push(`<strong>☀️ Solar:</strong> ${document.getElementById('solarOutput').value} kW peak × ${document.getElementById('solarHours').value} avg hrs/day = ${(parseFloat(document.getElementById('solarOutput').value) * parseFloat(document.getElementById('solarHours').value)).toFixed(2)} kWh`);
+            if (windEnable) sources.push(`<strong>💨 Wind:</strong> ${document.getElementById('windOutput').value} kW avg × ${document.getElementById('windHours').value} hrs/day = ${(parseFloat(document.getElementById('windOutput').value) * parseFloat(document.getElementById('windHours').value)).toFixed(2)} kWh`);
+            if (auxEnable) sources.push(`<strong>🔌 Auxiliary:</strong> ${document.getElementById('auxOutput').value} kW × ${document.getElementById('auxHours').value} hrs/day = ${(parseFloat(document.getElementById('auxOutput').value) * parseFloat(document.getElementById('auxHours').value)).toFixed(2)} kWh`);
+
+            if (sources.length > 0) {
+                document.getElementById('sourceInfo').style.display = 'block';
+                document.getElementById('sourceInfoText').innerHTML = sources.join('<br>');
+            } else {
+                document.getElementById('sourceInfo').style.display = 'none';
+            }
+        }
+
+        function calculatePower() {
+            if (loads.length === 0) {
+                alert('Please add at least one load to your system');
+                return;
+            }
+
+            // Calculate daily load energy
+            const dailyLoadEnergy = loads.reduce((sum, load) => {
+                const power = (load.amps * load.voltage) / 1000;
+                return sum + (power * load.hours);
+            }, 0);
+
+            // Calculate peak current and power
+            const peakCurrent = loads.reduce((sum, load) => sum + load.amps, 0);
+            const peakPower = (peakCurrent * currentVoltage) / 1000;
+
+            // Calculate daily supply energy
+            let dailySupplyEnergy = 0;
+            if (document.getElementById('alternatorEnable').checked) {
+                dailySupplyEnergy += parseFloat(document.getElementById('alternatorOutput').value) * parseFloat(document.getElementById('alternatorHours').value);
+            }
+            if (document.getElementById('gensetEnable').checked) {
+                dailySupplyEnergy += parseFloat(document.getElementById('gensetOutput').value) * parseFloat(document.getElementById('gensetHours').value);
+            }
+            if (document.getElementById('solarEnable').checked) {
+                dailySupplyEnergy += parseFloat(document.getElementById('solarOutput').value) * parseFloat(document.getElementById('solarHours').value);
+            }
+            if (document.getElementById('windEnable').checked) {
+                dailySupplyEnergy += parseFloat(document.getElementById('windOutput').value) * parseFloat(document.getElementById('windHours').value);
+            }
+            if (document.getElementById('auxEnable').checked) {
+                dailySupplyEnergy += parseFloat(document.getElementById('auxOutput').value) * parseFloat(document.getElementById('auxHours').value);
+            }
+
+            // Calculate balance
+            const balance = dailySupplyEnergy - dailyLoadEnergy;
+
+            // Update results display
+            document.getElementById('dailyLoadEnergy').textContent = dailyLoadEnergy.toFixed(2);
+            document.getElementById('dailySupplyEnergy').textContent = dailySupplyEnergy.toFixed(2);
+            document.getElementById('balanceEnergy').textContent = balance.toFixed(2);
+            document.getElementById('peakCurrent').textContent = peakCurrent.toFixed(1);
+            document.getElementById('peakPower').textContent = peakPower.toFixed(2);
+            document.getElementById('systemVoltage').textContent = currentVoltage;
+
+            // Update balance box styling
+            const balanceBox = document.getElementById('balanceBox');
+            balanceBox.classList.remove('warning', 'alert');
+            if (balance < 0) {
+                balanceBox.classList.add('alert');
+            } else if (balance < dailyLoadEnergy * 0.2) {
+                balanceBox.classList.add('warning');
+            }
+
+            // Update bars
+            const maxEnergy = Math.max(dailyLoadEnergy, dailySupplyEnergy) * 1.2;
+            const loadPercent = (dailyLoadEnergy / maxEnergy) * 100;
+            const supplyPercent = (dailySupplyEnergy / maxEnergy) * 100;
+
+            const barLoad = document.getElementById('barLoad');
+            const barSupply = document.getElementById('barSupply');
+            
+            barLoad.style.width = loadPercent + '%';
+            barSupply.style.width = supplyPercent + '%';
+
+            barLoad.classList.remove('alert', 'warning');
+            barSupply.classList.remove('alert', 'warning');
+
+            if (supplyPercent < loadPercent) {
+                barSupply.classList.add('alert');
+            } else if (supplyPercent < loadPercent * 1.2) {
+                barSupply.classList.add('warning');
+            }
+
+            document.getElementById('barLoadLabel').textContent = dailyLoadEnergy.toFixed(2) + ' kWh';
+            document.getElementById('barSupplyLabel').textContent = dailySupplyEnergy.toFixed(2) + ' kWh';
+            document.getElementById('barLoadText').textContent = dailyLoadEnergy.toFixed(2) + ' kWh';
+            document.getElementById('barSupplyText').textContent = dailySupplyEnergy.toFixed(2) + ' kWh';
+
+            // Generate detailed report
+            generateReport(dailyLoadEnergy, dailySupplyEnergy, balance, peakPower, peakCurrent);
+
+            // Show results
+            document.getElementById('results').classList.add('active');
+        }
+
+        function generateReport(loadEnergy, supplyEnergy, balance, peakPower, peakCurrent) {
+            const loadsReport = `
+                <div class="info-section">
+                    <h4>📋 Load Summary</h4>
+                    ${loads.map(load => {
+                        const power = (load.amps * load.voltage) / 1000;
+                        const energy = power * load.hours;
+                        return `${load.name} (${load.voltage}V): ${load.amps}A × ${load.hours}hrs = ${energy.toFixed(2)} kWh`;
+                    }).join('<br>')}
+                    <br><br><strong>Total Daily Load: ${loadEnergy.toFixed(2)} kWh</strong>
+                </div>
+            `;
+
+            const sourcesReport = `
+                <div class="info-section">
+                    <h4>⚡ Supply Summary</h4>
+                    ${document.getElementById('alternatorEnable').checked ? `<strong>Alternator:</strong> ${document.getElementById('alternatorOutput').value} kW × ${document.getElementById('alternatorHours').value} hrs = ${(parseFloat(document.getElementById('alternatorOutput').value) * parseFloat(document.getElementById('alternatorHours').value)).toFixed(2)} kWh<br>` : ''}
+                    ${document.getElementById('gensetEnable').checked ? `<strong>Genset:</strong> ${document.getElementById('gensetOutput').value} kW × ${document.getElementById('gensetHours').value} hrs = ${(parseFloat(document.getElementById('gensetOutput').value) * parseFloat(document.getElementById('gensetHours').value)).toFixed(2)} kWh<br>` : ''}
+                    ${document.getElementById('solarEnable').checked ? `<strong>Solar:</strong> ${document.getElementById('solarOutput').value} kW × ${document.getElementById('solarHours').value} hrs = ${(parseFloat(document.getElementById('solarOutput').value) * parseFloat(document.getElementById('solarHours').value)).toFixed(2)} kWh<br>` : ''}
+                    ${document.getElementById('windEnable').checked ? `<strong>Wind:</strong> ${document.getElementById('windOutput').value} kW × ${document.getElementById('windHours').value} hrs = ${(parseFloat(document.getElementById('windOutput').value) * parseFloat(document.getElementById('windHours').value)).toFixed(2)} kWh<br>` : ''}
+                    ${document.getElementById('auxEnable').checked ? `<strong>Auxiliary:</strong> ${document.getElementById('auxOutput').value} kW × ${document.getElementById('auxHours').value} hrs = ${(parseFloat(document.getElementById('auxOutput').value) * parseFloat(document.getElementById('auxHours').value)).toFixed(2)} kWh<br>` : ''}
+                    <br><strong>Total Daily Supply: ${supplyEnergy.toFixed(2)} kWh</strong>
+                </div>
+            `;
+
+            const analysis = `
+                <div class="info-section">
+                    <h4>💡 Recommendations</h4>
+                    ${balance > 0 ? 
+                        `<strong style="color: #76ff03;">✓ System is BALANCED - Surplus Energy</strong><br>
+                        Daily surplus: <strong>+${balance.toFixed(2)} kWh</strong><br>
+                        Your generation exceeds demand. Excellent for battery charging and extended autonomy.` :
+                        `<strong style="color: #ff6464;">✗ System has DEFICIT - Energy Shortfall</strong><br>
+                        Daily shortfall: <strong>${Math.abs(balance).toFixed(2)} kWh</strong><br>
+                        Consider: (1) Add solar or wind generation, (2) Upgrade genset, (3) Reduce load, (4) Hybrid system.`
+                    }
+                    <br><br>
+                    <strong>Peak System Load:</strong> ${peakPower.toFixed(2)} kW (${peakCurrent.toFixed(1)}A @ ${currentVoltage}V DC)<br>
+                    <strong>Wire Gauge:</strong> Use marine-grade cable sized for ${peakCurrent.toFixed(1)}A continuous current.<br>
+                    <strong>Battery Bank Size:</strong> Size to ${(loadEnergy * 2).toFixed(1)} kWh for 2-day autonomy without generation.
+                </div>
+            `;
+
+            document.getElementById('systemAnalysis').innerHTML = `
+                ${balance > 0 ? 
+                    '<strong style="color: #76ff03;">✓ BALANCED SYSTEM - Supply exceeds demand by ' + balance.toFixed(2) + ' kWh/day</strong>' :
+                    '<strong style="color: #ff6464;">✗ DEFICIT - Demand exceeds supply by ' + Math.abs(balance).toFixed(2) + ' kWh/day. Increase generation or reduce loads.</strong>'
+                }
+                <br><br>
+                <strong>Peak Load:</strong> ${peakPower.toFixed(2)} kW (${peakCurrent.toFixed(1)}A)<br>
+                <strong>Daily Balance:</strong> ${balance > 0 ? '+' : ''}${balance.toFixed(2)} kWh (${(balance > 0 ? 'SURPLUS' : 'DEFICIT')})
+            `;
+
+            document.getElementById('detailedReport').innerHTML = loadsReport + sourcesReport + analysis;
+        }
+
+        function resetForm() {
+            loads = [];
+            loadCounter = 0;
+            currentVoltage = 12;
+            document.getElementById('loadDeviceSelect').value = '';
+            document.getElementById('customLoadName').value = '';
+            document.querySelector('.custom-device-input').classList.remove('show');
+            document.getElementById('loadAmps').value = '';
+            document.getElementById('loadHours').value = '';
+            document.getElementById('alternatorEnable').checked = false;
+            document.getElementById('gensetEnable').checked = false;
+            document.getElementById('solarEnable').checked = false;
+            document.getElementById('windEnable').checked = false;
+            document.getElementById('auxEnable').checked = false;
+            document.getElementById('results').classList.remove('active');
+            renderLoads();
+            updateSourceInfo();
+            hideTooltip();
+        }
+
+        // Initialize
+        renderLoads();
+        updateSourceInfo();
+
+        // Update tooltip position on scroll
+        document.addEventListener('mousemove', function(e) {
+            const tooltip = document.getElementById('tooltip');
+            if (tooltip.classList.contains('show')) {
+                let x = e.pageX + 15;
+                let y = e.pageY + 15;
+                
+                if (x + 300 > window.innerWidth) {
+                    x = e.pageX - 315;
+                }
+                if (y + 100 > window.innerHeight) {
+                    y = e.pageY - 100;
+                }
+                
+                tooltip.style.left = x + 'px';
+                tooltip.style.top = y + 'px';
+            }
+        });
+    </script>
+</body>
+</html>
